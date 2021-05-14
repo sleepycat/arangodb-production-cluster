@@ -1,0 +1,54 @@
+apiVersion: database.arangodb.com/v1alpha
+kind: ArangoDeployment
+metadata:
+  name: arangodb
+  namespace: db
+spec:
+  agents:
+    count: 3
+    volumeClaimTemplate:
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        persistentVolumeReclaimPolicy: Retain
+        resources:
+          requests:
+            storage: 8Gi
+        storageClassName: slow-retain
+        volumeMode: Filesystem
+  bootstrap:
+    passwordSecretNames:
+      root: arangodb
+  coordinators:
+    count: 3
+  dbservers:
+    count: 3
+    volumeClaimTemplate:
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        persistentVolumeReclaimPolicy: Retain
+        resources:
+          requests:
+            storage: 80Gi
+        storageClassName: fast-retain
+        volumeMode: Filesystem
+  environment: Production
+  externalAccess:
+    type: None # Don't expose ArangoDB to the internet
+  image: arangodb/arangodb:3.7.10
+  metrics:
+    enabled: true
+  mode: Cluster
+  single:
+    storageClassName: standard2
+    volumeClaimTemplate:
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi
+        volumeMode: Filesystem
+  tls:
+    caSecretName: None # Let Istio handle tls.
